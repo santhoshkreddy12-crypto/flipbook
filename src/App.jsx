@@ -12,6 +12,7 @@ function App() {
   const [theme, setTheme] = useState('dark');
   const [markerMode, setMarkerMode] = useState(false);
   const [markerColor, setMarkerColor] = useState('rgba(253, 224, 71, 0.5)'); // yellow highlight
+  const [rotation, setRotation] = useState(0);
   const bookRef = useRef(null);
   // const [audio] = useState(() => new Audio('/page-flip.wav'));
 
@@ -105,6 +106,10 @@ function App() {
     setDimensions(prev => ({ width: prev.width * 0.9, height: prev.height * 0.9 }));
   };
 
+  const handleRotate = () => {
+    setRotation(prev => (prev + 90) % 360);
+  };
+
   return (
     <div className="min-h-[100dvh] bg-base text-main overflow-hidden flex flex-col font-sans relative selection:bg-blue-500/30 transition-colors duration-500">
       <header className="p-4 border-b border-border-soft bg-base/80 backdrop-blur-md z-10 flex items-center justify-between shadow-sm relative">
@@ -149,16 +154,18 @@ function App() {
           </div>
         ) : (
           <div className="w-full h-full flex-1 flex flex-col items-center justify-center relative z-0 py-8 px-4 animate-in fade-in duration-700">
-            <FlipbookViewer 
-              file={file} 
-              onPageChange={handlePageChange}
-              onLoadSuccess={handleLoadSuccess}
-              width={dimensions.width}
-              height={dimensions.height}
-              markerMode={markerMode}
-              markerColor={markerColor}
-              ref={bookRef}
-            />
+            <div className="transition-transform duration-500 ease-in-out" style={{ transform: `rotate(${rotation}deg)` }}>
+              <FlipbookViewer 
+                file={file} 
+                onPageChange={handlePageChange}
+                onLoadSuccess={handleLoadSuccess}
+                width={dimensions.width}
+                height={dimensions.height}
+                markerMode={markerMode}
+                markerColor={markerColor}
+                ref={bookRef}
+              />
+            </div>
           </div>
         )}
       </main>
@@ -172,6 +179,7 @@ function App() {
           onZoomIn={handleZoomIn}
           onZoomOut={handleZoomOut}
           onFullscreen={handleFullscreen}
+          onRotate={handleRotate}
           markerMode={markerMode}
           setMarkerMode={setMarkerMode}
           markerColor={markerColor}
