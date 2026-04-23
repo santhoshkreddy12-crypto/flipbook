@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize, Highlighter, RotateCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize, Highlighter } from 'lucide-react';
 
 const MARKER_COLORS = [
   { value: 'rgba(253, 224, 71, 0.5)', bg: 'bg-yellow-400' },
@@ -8,7 +8,7 @@ const MARKER_COLORS = [
   { value: 'rgba(147, 197, 253, 0.5)', bg: 'bg-blue-400' }
 ];
 
-const Controls = ({ pageNum, totalPages, onPrev, onNext, onZoomIn, onZoomOut, onFullscreen, onRotate, markerMode, setMarkerMode, markerColor, setMarkerColor }) => {
+const Controls = ({ pageNum, totalPages, onPrev, onNext, onZoomIn, onZoomOut, onFullscreen, markerMode, setMarkerMode, markerColor, setMarkerColor }) => {
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-panel/90 backdrop-blur-md px-6 py-3 rounded-full shadow-2xl border border-border-soft z-50 transition-all hover:bg-panel">
       
@@ -47,10 +47,6 @@ const Controls = ({ pageNum, totalPages, onPrev, onNext, onZoomIn, onZoomOut, on
         <Maximize className="w-5 h-5" />
       </button>
 
-      <button className="text-muted hover:text-main p-2 rounded-full hover:bg-panel-hover transition cursor-pointer" onClick={onRotate} title="Rotate Screen">
-        <RotateCw className="w-5 h-5" />
-      </button>
-
       <div className="w-px h-6 bg-border-soft mx-1"></div>
 
       <div className="flex items-center gap-2">
@@ -65,11 +61,11 @@ const Controls = ({ pageNum, totalPages, onPrev, onNext, onZoomIn, onZoomOut, on
         {markerMode && (
           <div className="flex gap-1 animate-in fade-in slide-in-from-left-2 ml-1">
             {MARKER_COLORS.map(c => (
-               <button
-                 key={c.value}
-                 onClick={() => setMarkerColor(c.value)}
-                 className={`w-5 h-5 rounded-full ${c.bg} transition-transform ${markerColor === c.value ? 'scale-125 ring-2 ring-white shadow-md' : 'hover:scale-110 opacity-70'} cursor-pointer`}
-               />
+              <button
+                key={c.value}
+                onClick={() => setMarkerColor(c.value)}
+                className={`w-5 h-5 rounded-full ${c.bg} transition-transform ${markerColor === c.value ? 'scale-125 ring-2 ring-white shadow-md' : 'hover:scale-110 opacity-70'} cursor-pointer`}
+              />
             ))}
           </div>
         )}
