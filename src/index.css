@@ -1,0 +1,60 @@
+@import "tailwindcss";
+
+@theme {
+  --color-base: var(--base);
+  --color-panel: var(--panel);
+  --color-panel-hover: var(--panel-hover);
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
+  --color-border-soft: var(--border-soft);
+  --color-ring-focus: var(--ring-focus);
+}
+
+:root {
+  /* LIGHT THEME */
+  --base: #f8fafc;
+  --panel: #ffffff;
+  --panel-hover: #f1f5f9;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border-soft: #e2e8f0;
+  --ring-focus: #cbd5e1;
+}
+
+:root[data-theme="dark"] {
+  /* DARK THEME */
+  --base: #111827;
+  --panel: #1f2937;
+  --panel-hover: #374151;
+  --text-main: #ffffff;
+  --text-muted: #9ca3af;
+  --border-soft: #374151;
+  --ring-focus: #4b5563;
+}
+
+:root[data-theme="sepia"] {
+  /* SEPIA THEME */
+  --base: #f4ecd8;
+  --panel: #fdf6e3;
+  --panel-hover: #eadebd;
+  --text-main: #433422;
+  --text-muted: #8a7b66;
+  --border-soft: #d3c6ab;
+  --ring-focus: #d3c6ab;
+}
+
+body {
+  background-color: var(--base);
+  color: var(--text-main);
+  @apply font-sans m-0 antialiased transition-colors duration-500;
+  min-height: 100vh;
+}
+
+.stf__wrapper {
+  margin: 0 auto !important;
+}
+
+.stf__block {
+  box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+  border-radius: 4px;
+}
