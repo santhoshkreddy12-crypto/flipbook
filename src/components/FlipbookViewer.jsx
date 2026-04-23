@@ -5,9 +5,42 @@ import * as pdfjsLib from 'pdfjs-dist';
 // Use CDN for worker to avoid Vite dev/build bundling issues which cause infinite hanging
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`;
 
-const Page = forwardRef(({ pageNum, pdf, width, height }, ref) => {
+const Page = forwardRef(({ pageNum, pdf, width, height, markerMode, markerColor }, ref) => {
   const canvasRef = useRef(null);
+  const svgRef = useRef(null);
   const [rendered, setRendered] = useState(false);
+  const [lines, setLines] = useState([]);
+  const [currentLine, setCurrentLine] = useState(null);
+
+  const handlePointerDownCapture = (e) => {
+    if (!markerMode || !svgRef.current) return;
+    e.stopPropagation();
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setCurrentLine({ points: [{x, y}], color: markerColor });
+  };
+
+  const handlePointerMoveCapture = (e) => {
+    if (!markerMode || !currentLine || !svgRef.current) return;
+    e.stopPropagation();
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    setCurrentLine(prev => ({
+      ...prev,
+      points: [...prev.points, {x, y}]
+    }));
+  };
+
+  const handlePointerUpCapture = (e) => {
+    if (!markerMode) return;
+    e.stopPropagation();
+    if (currentLine) {
+      setLines(prev => [...prev, currentLine]);
+      setCurrentLine(null);
+    }
+  };
 
   useEffect(() => {
     let renderTask;
@@ -76,19 +109,63 @@ const Page = forwardRef(({ pageNum, pdf, width, height }, ref) => {
       data-density={pageNum === 1 || pageNum === pdf.numPages ? "hard" : "soft"}
       style={paperBackground}
     >
-      <div className="flex-1 w-full flex items-center justify-center p-6 h-full relative">
+      <div 
+        className="flex-1 w-full flex items-center justify-center p-6 h-full relative"
+        onPointerDownCapture={handlePointerDownCapture}
+        onPointerMoveCapture={handlePointerMoveCapture}
+        onPointerUpCapture={handlePointerUpCapture}
+        onPointerLeave={handlePointerUpCapture}
+        style={{ touchAction: markerMode ? 'none' : 'auto', cursor: markerMode ? 'crosshair' : 'auto' }}
+      >
         {/* mix-blend-multiply forces the PDF's white background to vanish, printing the text directly into our paper texture */}
         <canvas 
           ref={canvasRef} 
-          className="max-w-full max-h-full z-10 relative" 
+          className="max-w-full max-h-full z-10 relative pointer-events-none" 
           style={{ mixBlendMode: 'multiply', filter: 'contrast(1.1) sepia(0.2)' }}
         />
         
-        {/* {!rendered && (
+        {/* SVG Marker Overlay */}
+        <svg 
+            ref={svgRef} 
+            className="absolute z-20" 
+            style={{ 
+              top: '24px', bottom: '24px', left: '24px', right: '24px',
+              width: 'calc(100% - 48px)', 
+              height: 'calc(100% - 48px)', 
+              pointerEvents: markerMode ? 'auto' : 'none',
+              mixBlendMode: 'multiply'
+            }}
+         >
+           {lines.map((line, i) => (
+              <polyline 
+                 key={i} 
+                 points={line.points.map(p => `${p.x},${p.y}`).join(' ')} 
+                 fill="none" 
+                 stroke={line.color} 
+                 strokeWidth="18" 
+                 strokeLinecap="round" 
+                 strokeLinejoin="round" 
+                 opacity="0.8"
+              />
+           ))}
+           {currentLine && (
+              <polyline 
+                 points={currentLine.points.map(p => `${p.x},${p.y}`).join(' ')} 
+                 fill="none" 
+                 stroke={currentLine.color} 
+                 strokeWidth="18" 
+                 strokeLinecap="round" 
+                 strokeLinejoin="round" 
+                 opacity="0.8"
+              />
+           )}
+        </svg>
+
+        {!rendered && (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-0" style={{ opacity: 0.5 }}>
             <span className="text-[#8a7b66] text-xs font-semibold font-serif">Loading page {pageNum}...</span>
           </div>
-        )} */}
+        )}
       </div>
       
       {/* Vintage Page number indicator */}
@@ -105,7 +182,7 @@ const Page = forwardRef(({ pageNum, pdf, width, height }, ref) => {
 const maxBookWidth = 500;
 const maxBookHeight = 700;
 
-const FlipbookViewer = forwardRef(({ file, onPageChange, onLoadSuccess, width, height }, ref) => {
+const FlipbookViewer = forwardRef(({ file, onPageChange, onLoadSuccess, width, height, markerMode, markerColor }, ref) => {
   const [pdf, setPdf] = useState(null);
   const [numPages, setNumPages] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -181,6 +258,7 @@ const FlipbookViewer = forwardRef(({ file, onPageChange, onLoadSuccess, width, h
         showCover={true}
         mobileScrollSupport={true}
         onFlip={onFlip}
+        useMouseEvents={!markerMode}
         ref={bookRef}
         className="flipbook mx-auto"
         style={{ margin: '0 auto', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.7)' }}
@@ -192,6 +270,8 @@ const FlipbookViewer = forwardRef(({ file, onPageChange, onLoadSuccess, width, h
             pdf={pdf} 
             width={width} 
             height={height} 
+            markerMode={markerMode}
+            markerColor={markerColor}
           />
         ))}
       </HTMLFlipBook>
