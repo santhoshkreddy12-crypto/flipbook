@@ -13,6 +13,7 @@ function App() {
   const [markerMode, setMarkerMode] = useState(false);
   const [markerColor, setMarkerColor] = useState('rgba(253, 224, 71, 0.5)'); // yellow highlight
   const [rotation, setRotation] = useState(0);
+  const [columns, setColumns] = useState(window.innerWidth < 768 ? 1 : 2);
   const bookRef = useRef(null);
   // const [audio] = useState(() => new Audio('/page-flip.wav'));
 
@@ -110,6 +111,10 @@ function App() {
     setRotation(prev => (prev + 90) % 360);
   };
 
+  const toggleColumns = () => {
+    setColumns(prev => prev === 1 ? 2 : 1);
+  };
+
   return (
     <div className="min-h-[100dvh] bg-base text-main overflow-hidden flex flex-col font-sans relative selection:bg-blue-500/30 transition-colors duration-500">
       <header className="p-4 border-b border-border-soft bg-base/80 backdrop-blur-md z-10 flex items-center justify-between shadow-sm relative">
@@ -161,6 +166,7 @@ function App() {
                 onLoadSuccess={handleLoadSuccess}
                 width={dimensions.width}
                 height={dimensions.height}
+                columns={columns}
                 markerMode={markerMode}
                 markerColor={markerColor}
                 ref={bookRef}
@@ -180,6 +186,8 @@ function App() {
           onZoomOut={handleZoomOut}
           onFullscreen={handleFullscreen}
           onRotate={handleRotate}
+          columns={columns}
+          onToggleColumns={toggleColumns}
           markerMode={markerMode}
           setMarkerMode={setMarkerMode}
           markerColor={markerColor}

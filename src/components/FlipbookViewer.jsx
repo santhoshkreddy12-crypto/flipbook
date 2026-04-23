@@ -182,7 +182,7 @@ const Page = forwardRef(({ pageNum, pdf, width, height, markerMode, markerColor 
 const maxBookWidth = 500;
 const maxBookHeight = 700;
 
-const FlipbookViewer = forwardRef(({ file, onPageChange, onLoadSuccess, width, height, markerMode, markerColor }, ref) => {
+const FlipbookViewer = forwardRef(({ file, onPageChange, onLoadSuccess, width, height, columns, markerMode, markerColor }, ref) => {
   const [pdf, setPdf] = useState(null);
   const [numPages, setNumPages] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -257,6 +257,7 @@ const FlipbookViewer = forwardRef(({ file, onPageChange, onLoadSuccess, width, h
         maxShadowOpacity={0.5}
         showCover={true}
         mobileScrollSupport={true}
+        usePortrait={columns === 1}
         onFlip={onFlip}
         useMouseEvents={!markerMode}
         ref={bookRef}

@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize, Highlighter, RotateCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Maximize, Highlighter, RotateCw, Columns, Square } from 'lucide-react';
 
 const MARKER_COLORS = [
   { value: 'rgba(253, 224, 71, 0.5)', bg: 'bg-yellow-400' },
@@ -8,7 +8,7 @@ const MARKER_COLORS = [
   { value: 'rgba(147, 197, 253, 0.5)', bg: 'bg-blue-400' }
 ];
 
-const Controls = ({ pageNum, totalPages, onPrev, onNext, onZoomIn, onZoomOut, onFullscreen, onRotate, markerMode, setMarkerMode, markerColor, setMarkerColor }) => {
+const Controls = ({ pageNum, totalPages, onPrev, onNext, onZoomIn, onZoomOut, onFullscreen, onRotate, columns, onToggleColumns, markerMode, setMarkerMode, markerColor, setMarkerColor }) => {
   return (
     <div className="fixed bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-4 bg-panel/90 backdrop-blur-md px-6 py-3 rounded-full shadow-2xl border border-border-soft z-50 transition-all hover:bg-panel">
       
@@ -49,6 +49,12 @@ const Controls = ({ pageNum, totalPages, onPrev, onNext, onZoomIn, onZoomOut, on
 
       <button className="text-muted hover:text-main p-2 rounded-full hover:bg-panel-hover transition cursor-pointer" onClick={onRotate} title="Rotate Screen">
         <RotateCw className="w-5 h-5" />
+      </button>
+
+      <div className="w-px h-6 bg-border-soft mx-1"></div>
+
+      <button className="text-muted hover:text-main p-2 rounded-full hover:bg-panel-hover transition cursor-pointer" onClick={onToggleColumns} title={columns === 1 ? "Switch to Double Page" : "Switch to Single Page"}>
+        {columns === 1 ? <Columns className="w-5 h-5" /> : <Square className="w-5 h-5" />}
       </button>
 
       <div className="w-px h-6 bg-border-soft mx-1"></div>
